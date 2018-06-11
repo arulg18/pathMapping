@@ -1,8 +1,6 @@
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.Stack;
+import java.util.*;
 
 public class Mapping {
 
@@ -41,10 +39,12 @@ public class Mapping {
     public void search(Node current, Node destination){
         pathway.clear();
 
+        PriorityQueue<Node> queueNodes = new PriorityQueue<>();
+
         LinkedList<Node> queue = new LinkedList<>();
 
         visited[current.x][current.y] = true;
-        current.setLast(new Node(-1, -1));
+       // current.setLast(new Node(-1, -1));
 
         queue.add(current);
 
@@ -63,10 +63,10 @@ public class Mapping {
                 if(nx == 13 && ny == 13){
                     System.out.println("here");
                 }
-                double k = distance(new Node(nx, ny), destination) + f_x(i);
+                double k = distance(new Node(nx, ny), destination) + f_x(i); // MAJOR FLAW WITH F(X) does not account for total distance
                 if (isValid2(nx, ny) && !isVisited(nx, ny)){
                     visited[nx][ny] = true;
-                    add(queue, k, destination, new Node(nx, ny, current));
+                    add(queue, k, destination, new Node(nx, ny/*, current*/));
                 }
 
             }
@@ -83,6 +83,12 @@ public class Mapping {
         }
 
 
+    }
+    public static int f_i(int i, Node last){
+        if (last.x == -1){
+            return 0;
+        }
+        return i ;//+ last.k -
     }
     public static double f_x(int i){
         switch (i){
@@ -149,20 +155,26 @@ public class Mapping {
     static class Node{
         int x,y;
         Node last;
-        enum orientation{
+        int k;
+        enum  orientation{
             n, ne, nw, s, se, sw, e, w, none;
         }
         orientation orient;
-
 
         public Node(int x, int y){
             this.x = x;
             this.y = y;
         }
-
-        public Node(int x, int y, Node last){
+        public Node(int x, int y, int k){
             this.x = x;
             this.y = y;
+            this.k = k;
+        }
+
+        public Node(int x, int y, int k,  Node last){
+            this.x = x;
+            this.y = y;
+            this.k = k;
             this.last = last;
         }
 

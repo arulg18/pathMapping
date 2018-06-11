@@ -4,14 +4,14 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Stack;
 
-public class Mapping2 {
+public class MappingDjikstra {
 
     public Field field;
     boolean[][] visited;
     Stack<Node> pathway;
 
     public static void main(String[] args) throws IOException, URISyntaxException {
-        Mapping2 map = new Mapping2();
+        MappingDjikstra map = new MappingDjikstra();
 
         map.search(new Node(26, 62), new Node(26, 60));
 
@@ -19,7 +19,7 @@ public class Mapping2 {
 
 
     }
-    public Mapping2() throws IOException, URISyntaxException {
+    public MappingDjikstra() throws IOException, URISyntaxException {
         field = new Field();
         visited = new boolean[field.field.length][field.field[0].length];
         pathway = new Stack<>();
@@ -50,7 +50,7 @@ public class Mapping2 {
 
 
 
-        while (queue.size() != 0 && !found){
+        while (queue.size() != 0){
             current = queue.poll();
             if (current.x == destination.x && current.y == destination.y){
                 found = true;
@@ -63,7 +63,7 @@ public class Mapping2 {
                 if(nx == 13 && ny == 13){
                     System.out.println("here");
                 }
-                double k = distance(new Node(nx, ny), destination) + f_x(i);
+                double k = /*distance(new Node(nx, ny), destination)*/ + f_x(i);
                 if (isValid2(nx, ny) && !isVisited(nx, ny)){
                     visited[nx][ny] = true;
                     add(queue, k, destination, new Node(nx, ny, current));

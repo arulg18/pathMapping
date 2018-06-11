@@ -1,25 +1,24 @@
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.Stack;
+import java.util.*;
 
-public class Mapping2 {
+public class Mapping3 {
 
     public Field field;
     boolean[][] visited;
     Stack<Node> pathway;
 
     public static void main(String[] args) throws IOException, URISyntaxException {
-        Mapping2 map = new Mapping2();
 
-        map.search(new Node(26, 62), new Node(26, 60));
+        Mapping3 map = new Mapping3();
+
+        map.search(new Node(26, 62, 0), new Node(26, 60, Integer.MAX_VALUE));
 
         map.printPathwayCoordinates();
 
 
     }
-    public Mapping2() throws IOException, URISyntaxException {
+    public Mapping3() throws IOException, URISyntaxException {
         field = new Field();
         visited = new boolean[field.field.length][field.field[0].length];
         pathway = new Stack<>();
@@ -41,16 +40,15 @@ public class Mapping2 {
     public void search(Node current, Node destination){
         pathway.clear();
 
+
         LinkedList<Node> queue = new LinkedList<>();
 
         visited[current.x][current.y] = true;
-        current.setLast(new Node(-1, -1));
+        current.setLast(new Node(-1, -1, 0));
 
         queue.add(current);
 
-
-
-        while (queue.size() != 0 && !found){
+        while (queue.size() != 0){
             current = queue.poll();
             if (current.x == destination.x && current.y == destination.y){
                 found = true;
@@ -60,13 +58,11 @@ public class Mapping2 {
             for (int i = 0; i < dx.length; i++) {
                 int nx = current.x + dx[i];
                 int ny = current.y + dy[i];
-                if(nx == 13 && ny == 13){
-                    System.out.println("here");
-                }
-                double k = distance(new Node(nx, ny), destination) + f_x(i);
-                if (isValid2(nx, ny) && !isVisited(nx, ny)){
+
+                double k = f_x(i) + current.k;
+                if (isValid2(nx, ny)){
                     visited[nx][ny] = true;
-                    add(queue, k, destination, new Node(nx, ny, current));
+                    add(queue, k, destination, new Node(nx, ny, k, current));
                 }
 
             }
@@ -100,20 +96,33 @@ public class Mapping2 {
         }
         return 0;
     }
+    public int binaryInsert(LinkedList<Node> queue, int l, int r, double k) {
+
+        while (true) {
+            int curIn = (r + l) / 2;
+            if (l == curIn) {
+                if (queue.get(curIn).k > k) {
+                    return curIn;
+                }
+            }
+            if (queue.get(curIn).k < k) {
+                l = curIn + 1; // its in the upper
+                if (l > r) {
+                    return curIn += 1;
+                }
+            } else if (l > r) {
+                return curIn;
+            } else {
+                r = curIn - 1; // its in the lower
+            }
+        }
+    }
     public void add(LinkedList<Node> queue, double k, Node destination, Node adj){
         if (queue.size()==0){
             queue.add(adj);
             return;
         }
-        int i = 0;
-        while (i < queue.size() && distance(queue.get(i), destination) < k){
-            i++;
-        }
-        if(i == queue.size()){
-            queue.add(adj);
-        }else {
-            queue.add(i, adj);
-        }
+        queue.add(binaryInsert(queue, 0, queue.size() - 1, adj.k), adj);
     }
 
 
@@ -149,20 +158,26 @@ public class Mapping2 {
     static class Node{
         int x,y;
         Node last;
+        double k;
         enum  orientation{
             n, ne, nw, s, se, sw, e, w, none;
         }
         orientation orient;
 
-
-        public Node(int x, int y){
-            this.x = x;
-            this.y = y;
+        public void setK(double k) {
+            this.k = k;
         }
 
-        public Node(int x, int y, Node last){
+        public Node(int x, int y, int k){
             this.x = x;
             this.y = y;
+            this.k = k;
+        }
+
+        public Node(int x, int y, double k, Node last){
+            this.x = x;
+            this.y = y;
+            this.k = k;
             this.last = last;
         }
 
