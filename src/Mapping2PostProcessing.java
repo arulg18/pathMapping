@@ -1,10 +1,9 @@
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
-import java.util.ListIterator;
 import java.util.Stack;
 
-public class Mapping2 {
+public class Mapping2PostProcessing {
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLACK = "\u001B[30m";
     public static final String ANSI_RED = "\u001B[31m";
@@ -19,23 +18,19 @@ public class Mapping2 {
     Stack<Node> pathway;
     public double total = 0;
 
-    static int[] start;
-    static int[] end;
-
-
     public static void main(String[] args) throws IOException, URISyntaxException {
-        Mapping2 map = new Mapping2();
+        Mapping2PostProcessing map = new Mapping2PostProcessing();
 
-        start = new int[] {134, 10, 1};
-        end = new int[] {20, 140, 4};
-        map.search(new Mapping2.Node(start[0], start[1]), new Mapping2.Node(end[0], end[1]));
+        int[] start = {134, 10, 1};
+        int[] end = {20, 140, 4};
+        map.search(new Mapping2PostProcessing.Node(start[0], start[1]), new Mapping2PostProcessing.Node(end[0], end[1]));
 
         map.printPathwayCoordinates();
         map.displayPath();
 
 
     }
-    public Mapping2() throws IOException, URISyntaxException {
+    public Mapping2PostProcessing() throws IOException, URISyntaxException {
         field = new Field();
         visited = new boolean[field.field.length][field.field[0].length];
         pathway = new Stack<>();
@@ -51,15 +46,10 @@ public class Mapping2 {
         }
         for (int i = 0; i < field.field.length; i++) {
             for (int j = 0; j < field.field[i].length; j++) {
-                if (i == start[1] && j == start[0]){
-                    System.out.print(ANSI_GREEN + "2" + ANSI_RESET + " ");
-                }
-                else if (i == end[1] && j == end[0]){
-                    System.out.print(ANSI_BLUE + "2" + ANSI_RESET + " ");
-
-                }
-                else {
-                    System.out.print((path[j][i] ? ANSI_BLUE + "2" + ANSI_RESET : field.field[j][i]==1 ? ANSI_WHITE + "1" + ANSI_RESET : ANSI_RED +  "0" + ANSI_RESET) + " ");
+                if (i == 10 && j == 134){
+                    System.out.print(ANSI_GREEN + "1" + ANSI_RESET + " ");
+                }else {
+                    System.out.print((path[j][i] ? ANSI_RED + "1" + ANSI_RESET : "0") + " ");
                 }
             }
             System.out.println();
@@ -137,6 +127,7 @@ public class Mapping2 {
                 path = path.last;
             }
         }
+
 
 
     }
