@@ -16,6 +16,8 @@ public class Visualizer extends JFrame {
     private static String title = "Autonomous Mapping Algorithm";
 
     Font DIN = new Font("DIN Alternate", Font.BOLD, 54);
+    Font DIN2 = new Font("DIN Alternate", Font.BOLD, 40);
+
     Font Lunar = new Font("Lunar Eclipse", 0, 90);
     Font Avenir = new Font("Avenir Next", 1, 170);
     Font Avenir2 = new Font("Avenir Next", Font.BOLD, 50);
@@ -34,6 +36,8 @@ public class Visualizer extends JFrame {
     JTextField endPointY;
 
     JLabel distance;
+    JScrollPane scrollPane;
+    JLabel points;
 
     JLabel mappingPageTitle;
     int total = 0;
@@ -144,10 +148,11 @@ public class Visualizer extends JFrame {
         distanceBack.setLocation(30, endBack.getY() + endBack.getHeight() + 20);
 
         distance = new JLabel();
-        distance.setText(Integer.toString(total));
-        distance.setFont(DIN);
+        distance.setText("<html><div style='text-align: center;'>" + Integer.toString(total) + "</div></html>");
+        distance.setFont(DIN2);
+
         distance.setSize(distance.getPreferredSize());
-        distance.setLocation(distanceBack.getX() + distanceBack.getWidth()/2 , distanceBack.getY() + distanceBack.getHeight()/2);
+        distance.setLocation(distanceBack.getX() + distanceBack.getWidth()/2 - distance.getWidth()/2, distanceBack.getY() + distanceBack.getHeight()/2);
 
         pathBack = new JLabel();
         ImageIcon img4 = new ImageIcon(getClass().getResource("Path.png"));
@@ -155,9 +160,16 @@ public class Visualizer extends JFrame {
         pathBack.setSize(pathBack.getPreferredSize());
         pathBack.setLocation(30, distanceBack.getY() + distanceBack.getHeight() + 20);
 
+        points = new JLabel("Hei");
+
+        scrollPane = new JScrollPane();
+        scrollPane.add(points);
+        scrollPane.setSize(330, 200);
+
+        scrollPane.setLocation(pathBack.getX(), pathBack.getY());
 
 
-        addItemsToFrame(mappingPageTitle, endPointX, endPointY, endBack, startPointX, startPointY, startBack, distance, distanceBack, pathBack);
+        addItemsToFrame(mappingPageTitle, scrollPane, endPointX, endPointY, endBack, startPointX, startPointY, startBack, distance, distanceBack, pathBack);
 
     }
 
