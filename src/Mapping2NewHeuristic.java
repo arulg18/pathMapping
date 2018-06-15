@@ -253,6 +253,7 @@ public class Mapping2NewHeuristic {
 
         double x = (b2*c1 - b1*c2)/determinant;
         double y = (a1*c2 - a2*c1)/determinant;
+
         return new Point(x, y);
 
     }

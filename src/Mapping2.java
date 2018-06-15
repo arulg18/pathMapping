@@ -16,7 +16,7 @@ public class Mapping2 {
     public static final String ANSI_WHITE = "\u001B[37m";
     public Field field;
     boolean[][] visited;
-    Stack<Node> pathway;
+    public Stack<Node> pathway;
     public double total = 0;
 
     static int[] start;
@@ -26,14 +26,23 @@ public class Mapping2 {
     public static void main(String[] args) throws IOException, URISyntaxException {
         Mapping2 map = new Mapping2();
 
-        start = new int[] {134, 10, 1};
-        end = new int[] {20, 140, 4};
-        map.search(new Mapping2.Node(start[0], start[1]), new Mapping2.Node(end[0], end[1]));
+        map.search(11, 11, 0, 11, 8 ,0);
 
         map.printPathwayCoordinates();
         map.displayPath();
 
 
+    }
+    public boolean search(int sx, int sy, int sr, int ex, int ey, int er){
+        if (isValid(sx, sy) && isValid(ex, ey)) {
+            start = new int[]{sx, sy, sr};
+            end = new int[]{ex, ey, er};
+            this.search(new Mapping2.Node(start[0], start[1]), new Mapping2.Node(end[0], end[1]));
+            return true;
+        }
+        else {
+            return false;
+        }
     }
     public Mapping2() throws IOException, URISyntaxException {
         field = new Field();
@@ -41,6 +50,7 @@ public class Mapping2 {
         pathway = new Stack<>();
 
     }
+
     public boolean[][] displayPath(){
         Stack<Node> nodeStack = (Stack<Node>) pathway.clone();
         boolean[][] path = new boolean[field.field.length][field.field[0].length];
@@ -123,6 +133,7 @@ public class Mapping2 {
                     visited[nx][ny] = true;
 
                     add(queue, k, destination, new Node(nx, ny, f, current));
+
                 }
 
             }
@@ -132,6 +143,7 @@ public class Mapping2 {
         if (found) {
 
             Node path = destination;
+            total = destination.k;
             while (path.x != -1 && path.y != -1) {
                 pathway.add(path);
                 path = path.last;
@@ -175,7 +187,7 @@ public class Mapping2 {
 
     static int[] dx = new int[]{-1,1,0,0, 1, -1, 1, -1};
     static int[] dy = new int[]{0,0,-1,1, 1, 1, -1, -1};
-    static boolean found = false;
+    boolean found = false;
 
     public boolean isValid(int x, int y){
         return x >= 0 && x < field.field.length && y >= 0 && y < field.field[x].length && field.field[x][y]!=0;

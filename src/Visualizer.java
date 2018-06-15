@@ -1,3 +1,5 @@
+import javafx.scene.layout.Pane;
+
 import javax.swing.*;
 import javax.swing.plaf.ButtonUI;
 import java.awt.*;
@@ -5,10 +7,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.Stack;
 
 public class Visualizer extends JFrame {
 
-    JButton[][] field = new JButton[145][145];
     static GraphicsDevice device = GraphicsEnvironment
             .getLocalGraphicsEnvironment().getScreenDevices()[0];
 
@@ -28,6 +31,9 @@ public class Visualizer extends JFrame {
     JLabel endBack;
     JLabel distanceBack;
     JLabel pathBack;
+    JPanel panel;
+
+    Color[] colors = {new Color(170, 23, 40), new Color(52, 165, 218), new Color(135, 49, 187), new Color(255 , 255, 255), new Color(227, 137, 0)};
 
     JTextField startPointX;
     JTextField startPointY;
@@ -39,7 +45,12 @@ public class Visualizer extends JFrame {
     JScrollPane scrollPane;
     JLabel points;
 
-    JLabel mappingPageTitle;
+    JPanel[][] fieldVisual = new JPanel[145][145];
+
+    Mapping2 mapping2;
+
+    JButton mappingPageTitle;
+    boolean done;
     int total = 0;
 
     public static void main (String[] args) throws  IOException{
@@ -62,8 +73,7 @@ public class Visualizer extends JFrame {
 
         opening();
 
-        this.setLayout(null);
-        this.setVisible(true);
+
 
     }
 
@@ -89,21 +99,54 @@ public class Visualizer extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if ((JButton) e.getSource() == start){
                     clearScreen();
-                    mappingVisualizer();
+
+                    try {
+                        mappingVisualizer();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    } catch (URISyntaxException e1) {
+                        e1.printStackTrace();
+                    }
                 }
             }
         });
 
         addItemsToFrame(start, Title);
+        this.setLayout(null);
+        this.setVisible(true);
 
     }
-    public void mappingVisualizer(){
-        mappingPageTitle = new JLabel();
+    public void mappingVisualizer() throws IOException, URISyntaxException {
+        mapping2 = new Mapping2();
+
+        mappingPageTitle = new JButton();
         mappingPageTitle.setForeground(new Color(52, 165, 218));
         mappingPageTitle.setText("Mapping");
         mappingPageTitle.setFont(DIN);
         mappingPageTitle.setSize(300, 100);
         mappingPageTitle.setLocation(30, 0);
+        mappingPageTitle.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if ((JButton) e.getSource() == mappingPageTitle){
+
+
+                    try{
+                        mapping2 = new Mapping2();
+                        done = mapping2.search(Integer.parseInt(startPointX.getText()), Integer.parseInt(startPointY.getText()), 0, Integer.parseInt(endPointX.getText()), Integer.parseInt(endPointY.getText()), 0);
+                        visualize(Integer.parseInt(startPointX.getText()), Integer.parseInt(startPointY.getText()), Integer.parseInt(endPointX.getText()), Integer.parseInt(endPointY.getText()));
+                    }catch (NumberFormatException x){
+                        mappingPageTitle.setText("Choose valid numbers");
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    } catch (URISyntaxException e1) {
+                        e1.printStackTrace();
+                    }
+
+
+                }
+            }
+        });
 
         startBack = new JLabel();
         ImageIcon imageIcon = new ImageIcon(getClass().getResource("StartPoint.png"));
@@ -154,22 +197,76 @@ public class Visualizer extends JFrame {
         distance.setSize(distance.getPreferredSize());
         distance.setLocation(distanceBack.getX() + distanceBack.getWidth()/2 - distance.getWidth()/2, distanceBack.getY() + distanceBack.getHeight()/2);
 
-        pathBack = new JLabel();
-        ImageIcon img4 = new ImageIcon(getClass().getResource("Path.png"));
-        pathBack.setIcon(img4);
-        pathBack.setSize(pathBack.getPreferredSize());
-        pathBack.setLocation(30, distanceBack.getY() + distanceBack.getHeight() + 20);
-
-        points = new JLabel("Hei");
-
-        scrollPane = new JScrollPane();
-        scrollPane.add(points);
-        scrollPane.setSize(330, 200);
-
-        scrollPane.setLocation(pathBack.getX(), pathBack.getY());
 
 
-        addItemsToFrame(mappingPageTitle, scrollPane, endPointX, endPointY, endBack, startPointX, startPointY, startBack, distance, distanceBack, pathBack);
+
+
+        addItemsToFrame(mappingPageTitle/*, scrollPane*/, endPointX, endPointY, endBack, startPointX, startPointY, startBack, distance, distanceBack);
+        paintField();
+
+        this.setLayout(null);
+        this.setVisible(true);
+
+
+
+    }
+    public void visualize(int sx, int sy, int ex, int ey){
+        int x = mappingPageTitle.getX() + mappingPageTitle.getWidth() + 30;
+        int y = mappingPageTitle.getY();
+        this.setBackground(colors[0]);
+
+
+        Stack<Mapping2.Node> nodeStack = (Stack<Mapping2.Node>) mapping2.pathway.clone();
+        boolean[][] path = new boolean[mapping2.field.field.length][mapping2.field.field[0].length];
+        distance.setText(Double.toString(Math.ceil(mapping2.total)));
+        distance.setSize(distance.getPreferredSize());
+
+        while (nodeStack.size() != 0){
+            Mapping2.Node c = nodeStack.pop();
+            int j = c.x;
+            int i = c.y;
+            if (done && i == sy && j == sx){
+                fieldVisual[i][j].setBackground(colors[2]);
+            }
+            else if (done && i == ey && j == ex){
+                fieldVisual[i][j].setBackground(colors[4]);
+
+            }
+            else {
+                fieldVisual[i][j].setBackground(colors[3]);
+            }
+
+            //fieldVisual[i][j].setLocation(j , i );
+            fieldVisual[i][j].setVisible(true);
+
+            this.add(fieldVisual[i][j]);
+            this.revalidate();
+            System.out.println("(" + i + ", " + j + ")");
+        }
+
+
+
+
+        //this.repaint();
+    }
+    public void paintField(){
+        int x = mappingPageTitle.getX() + mappingPageTitle.getWidth() + 30;
+        int y = mappingPageTitle.getY();
+
+        for (int i = 0; i < mapping2.field.field.length; i++) {
+            for (int j = 0; j < mapping2.field.field[i].length; j++) {
+                fieldVisual[i][j] = new JPanel();
+                fieldVisual[i][j].setSize(4, 4);
+                fieldVisual[i][j].setBackground(mapping2.field.field[j][i]==1 ? colors[1] : colors[0]);
+                fieldVisual[i][j].setLocation(x + j * (fieldVisual[i][j].getWidth() + 1), 40 + i * (fieldVisual[i][j].getHeight() + 1));
+                fieldVisual[i][j].setVisible(true);
+                this.add(fieldVisual[i][j]);
+                System.out.println("(" + i + ", " + j + ")");
+
+            }
+
+        }
+        this.revalidate();
 
     }
 
